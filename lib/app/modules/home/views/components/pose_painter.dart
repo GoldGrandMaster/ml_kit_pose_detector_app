@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_mlkit_pose_detection/google_mlkit_pose_detection.dart';
-
 import 'coordinate_translator.dart';
 import 'dart:math';
 import 'package:vector_math/vector_math.dart' as vector;
-
-//description: pose_painter and calculate_angle
-
-
+import 'dart:developer';
 
 class PosePainter extends CustomPainter {
   PosePainter(this.poses, this.absoluteImageSize, this.rotation);
@@ -38,7 +34,188 @@ class PosePainter extends CustomPainter {
       ..strokeWidth = 2.0
       ..color = Colors.white;
 
+    double floorWithFixedDecimal(double number, int decimalPlaces) =>
+        (number * pow(10, decimalPlaces)).floorToDouble() /
+        pow(10, decimalPlaces);
+
     for (final pose in poses) {
+      final PoseLandmark jointNose = pose.landmarks[PoseLandmarkType.nose]!;
+      final PoseLandmark jointLeftEyeInner =
+          pose.landmarks[PoseLandmarkType.leftEyeInner]!;
+      final PoseLandmark jointLeftEye =
+          pose.landmarks[PoseLandmarkType.leftEye]!;
+      final PoseLandmark jointLeftEyeOuter =
+          pose.landmarks[PoseLandmarkType.leftEyeOuter]!;
+      final PoseLandmark jointRightEyeInner =
+          pose.landmarks[PoseLandmarkType.rightEyeInner]!;
+      final PoseLandmark jointRightEye =
+          pose.landmarks[PoseLandmarkType.rightEye]!;
+      final PoseLandmark jointRightEyeOuter =
+          pose.landmarks[PoseLandmarkType.rightEyeOuter]!;
+      final PoseLandmark jointLeftEar =
+          pose.landmarks[PoseLandmarkType.leftEar]!;
+      final PoseLandmark jointRightEar =
+          pose.landmarks[PoseLandmarkType.rightEar]!;
+      final PoseLandmark jointLeftMouth =
+          pose.landmarks[PoseLandmarkType.leftMouth]!;
+      final PoseLandmark jointRightMouth =
+          pose.landmarks[PoseLandmarkType.rightMouth]!;
+      final PoseLandmark jointLeftShoulder =
+          pose.landmarks[PoseLandmarkType.leftShoulder]!;
+      final PoseLandmark jointRightShoulder =
+          pose.landmarks[PoseLandmarkType.rightShoulder]!;
+      final PoseLandmark jointLeftElbow =
+          pose.landmarks[PoseLandmarkType.leftElbow]!;
+      final PoseLandmark jointRightElbow =
+          pose.landmarks[PoseLandmarkType.rightElbow]!;
+      final PoseLandmark jointLeftWrist =
+          pose.landmarks[PoseLandmarkType.leftWrist]!;
+      final PoseLandmark jointRightWrist =
+          pose.landmarks[PoseLandmarkType.rightWrist]!;
+      final PoseLandmark jointLeftPinky =
+          pose.landmarks[PoseLandmarkType.leftPinky]!;
+      final PoseLandmark jointRightPinky =
+          pose.landmarks[PoseLandmarkType.rightPinky]!;
+      final PoseLandmark jointLeftIndex =
+          pose.landmarks[PoseLandmarkType.leftIndex]!;
+      final PoseLandmark jointRightIndex =
+          pose.landmarks[PoseLandmarkType.rightIndex]!;
+      final PoseLandmark jointLeftThumb =
+          pose.landmarks[PoseLandmarkType.leftThumb]!;
+      final PoseLandmark jointRightThumb =
+          pose.landmarks[PoseLandmarkType.rightThumb]!;
+      final PoseLandmark jointLeftHip =
+          pose.landmarks[PoseLandmarkType.leftHip]!;
+      final PoseLandmark jointRightHip =
+          pose.landmarks[PoseLandmarkType.rightHip]!;
+      final PoseLandmark jointLeftKnee =
+          pose.landmarks[PoseLandmarkType.leftKnee]!;
+      final PoseLandmark jointRightKnee =
+          pose.landmarks[PoseLandmarkType.rightKnee]!;
+      final PoseLandmark jointLeftAnkle =
+          pose.landmarks[PoseLandmarkType.leftAnkle]!;
+      final PoseLandmark jointRightAnkle =
+          pose.landmarks[PoseLandmarkType.rightAnkle]!;
+      final PoseLandmark jointLeftHeel =
+          pose.landmarks[PoseLandmarkType.leftHeel]!;
+      final PoseLandmark jointRightHeel =
+          pose.landmarks[PoseLandmarkType.rightHeel]!;
+      final PoseLandmark jointLeftFootIndex =
+          pose.landmarks[PoseLandmarkType.leftFootIndex]!;
+      final PoseLandmark jointRightFootIndex =
+          pose.landmarks[PoseLandmarkType.rightFootIndex]!;
+
+      double tp = 0.99;
+      bool bf = true;
+      bf = bf &&
+          (jointNose.likelihood >= tp) &&
+          (jointLeftEyeInner.likelihood >= tp) &&
+          (jointLeftEye.likelihood >= tp) &&
+          (jointLeftEyeOuter.likelihood >= tp) &&
+          (jointRightEyeInner.likelihood >= tp) &&
+          (jointRightEye.likelihood >= tp) &&
+          (jointRightEyeOuter.likelihood >= tp) &&
+          (jointLeftEar.likelihood >= tp) &&
+          (jointRightEar.likelihood >= tp) &&
+          (jointLeftMouth.likelihood >= tp) &&
+          (jointRightMouth.likelihood >= tp) &&
+          (jointLeftShoulder.likelihood >= tp) &&
+          (jointRightShoulder.likelihood >= tp) &&
+          (jointLeftElbow.likelihood >= tp) &&
+          (jointRightElbow.likelihood >= tp) &&
+          (jointLeftWrist.likelihood >= tp) &&
+          (jointRightWrist.likelihood >= tp) &&
+          (jointLeftPinky.likelihood >= tp) &&
+          (jointRightPinky.likelihood >= tp) &&
+          (jointLeftIndex.likelihood >= tp) &&
+          (jointRightIndex.likelihood >= tp) &&
+          (jointLeftThumb.likelihood >= tp) &&
+          (jointRightThumb.likelihood >= tp) &&
+          (jointLeftHip.likelihood >= tp) &&
+          (jointRightHip.likelihood >= tp) &&
+          (jointLeftKnee.likelihood >= tp) &&
+          (jointRightKnee.likelihood >= tp) &&
+          (jointLeftAnkle.likelihood >= tp) &&
+          (jointRightAnkle.likelihood >= tp) &&
+          (jointLeftHeel.likelihood >= tp) &&
+          (jointRightHeel.likelihood >= tp) &&
+          (jointLeftFootIndex.likelihood >= tp) &&
+          (jointRightFootIndex.likelihood >= tp);
+
+      //Notificiation when user's body not fully visible or correct distance
+      if (!bf) {
+        final Notification = TextSpan(
+          text:
+              'Please Keep your body fully\nvisible on camera to start or\nKeep distance as 5 to 6 ft!',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 30,
+          ),
+        );
+        final textpainter = TextPainter(
+          text: Notification,
+          textAlign: TextAlign.center,
+          textDirection: TextDirection.ltr,
+        );
+        textpainter.layout();
+
+        final offSet = Offset(
+            200 - (textpainter.width * 0.5), 50 - (textpainter.height * 0.5));
+        textpainter.paint(canvas, offSet);
+      }
+
+      //Display Inframelikelihood value of joints
+      final textLikelihood = TextSpan(
+        text: 'inframeLikelihood\n' +
+            'Nose:${floorWithFixedDecimal(jointNose.likelihood, 4)}\n' +
+            'LeftEyeIneer:${floorWithFixedDecimal(jointLeftEyeInner.likelihood, 4)}\n' +
+            'LeftEye:${floorWithFixedDecimal(jointLeftEye.likelihood, 4)}\n' +
+            'LeftEyeOuter:${floorWithFixedDecimal(jointLeftEyeOuter.likelihood, 4)}\n' +
+            'RightEyeInner:${floorWithFixedDecimal(jointRightEyeInner.likelihood, 4)}\n' +
+            'RightEye:${floorWithFixedDecimal(jointRightEye.likelihood, 4)}\n' +
+            'RightEyeOuter:${floorWithFixedDecimal(jointRightEyeOuter.likelihood, 4)}\n' +
+            'LeftEar:${floorWithFixedDecimal(jointLeftEar.likelihood, 4)}\n' +
+            'RightEar:${floorWithFixedDecimal(jointRightEar.likelihood, 4)}\n' +
+            'LeftMouth:${floorWithFixedDecimal(jointLeftMouth.likelihood, 4)}\n' +
+            'RightMouth:${floorWithFixedDecimal(jointRightMouth.likelihood, 4)}\n' +
+            'LeftShoulder:${floorWithFixedDecimal(jointLeftShoulder.likelihood, 4)}\n' +
+            'RightShoulder:${floorWithFixedDecimal(jointRightShoulder.likelihood, 4)}\n' +
+            'LeftElbow:${floorWithFixedDecimal(jointLeftElbow.likelihood, 4)}\n' +
+            'RightElbow:${floorWithFixedDecimal(jointRightElbow.likelihood, 4)}\n' +
+            'LeftWrist:${floorWithFixedDecimal(jointLeftWrist.likelihood, 4)}\n' +
+            'RightWrist:${floorWithFixedDecimal(jointRightWrist.likelihood, 4)}\n' +
+            'LeftPinky:${floorWithFixedDecimal(jointLeftPinky.likelihood, 4)}\n' +
+            'RightPinky:${floorWithFixedDecimal(jointRightPinky.likelihood, 4)}\n' +
+            'LeftIndex:${floorWithFixedDecimal(jointLeftIndex.likelihood, 4)}\n' +
+            'RightIndex:${floorWithFixedDecimal(jointRightIndex.likelihood, 4)}\n' +
+            'LeftThumb:${floorWithFixedDecimal(jointLeftThumb.likelihood, 4)}\n' +
+            'RightThumb:${floorWithFixedDecimal(jointRightThumb.likelihood, 4)}\n' +
+            'LeftHip:${floorWithFixedDecimal(jointLeftHip.likelihood, 4)}\n' +
+            'LeftRightHip:${floorWithFixedDecimal(jointRightHip.likelihood, 4)}\n' +
+            'LeftKnee:${floorWithFixedDecimal(jointLeftKnee.likelihood, 4)}\n' +
+            'RightKnee:${floorWithFixedDecimal(jointRightKnee.likelihood, 4)}\n' +
+            'LeftAnkle:${floorWithFixedDecimal(jointLeftAnkle.likelihood, 4)}\n' +
+            'RightAnkle:${floorWithFixedDecimal(jointRightAnkle.likelihood, 4)}\n' +
+            'LeftHeel:${floorWithFixedDecimal(jointLeftHeel.likelihood, 4)}\n' +
+            'RightHeel:${floorWithFixedDecimal(jointRightHeel.likelihood, 4)}\n' +
+            'LeftFootIndex:${floorWithFixedDecimal(jointLeftFootIndex.likelihood, 4)}\n' +
+            'RightFootIndex:${floorWithFixedDecimal(jointRightFootIndex.likelihood, 4)}\n',
+        style: TextStyle(
+          color: Colors.deepOrange,
+          fontSize: 15,
+        ),
+      );
+      final textpainter = TextPainter(
+        text: textLikelihood,
+        textAlign: TextAlign.center,
+        textDirection: TextDirection.ltr,
+      );
+      textpainter.layout();
+
+      final offSet = Offset(
+          90 - (textpainter.width * 0.5), 450 - (textpainter.height * 0.5));
+      textpainter.paint(canvas, offSet);
+
       pose.landmarks.forEach((_, landmark) {
         canvas.drawCircle(
             Offset(
@@ -49,10 +226,8 @@ class PosePainter extends CustomPainter {
             paint);
       });
 
-      void paintLine(PoseLandmarkType type1, PoseLandmarkType type2,
-          Paint paintType) {
-        final PoseLandmark joint1 = pose.landmarks[type1]!;
-        final PoseLandmark joint2 = pose.landmarks[type2]!;
+      //Line between two joints
+      void paintLine(joint1, joint2, Paint paintType) {
         canvas.drawLine(
             Offset(translateX(joint1.x, rotation, size, absoluteImageSize),
                 translateY(joint1.y, rotation, size, absoluteImageSize)),
@@ -61,6 +236,7 @@ class PosePainter extends CustomPainter {
             paintType);
       }
 
+      //Calcuate angle of 3 joint points
       double CalculateAngle(Offset p1, Offset p2, Offset p3) {
         final vector.Vector2 v1 = vector.Vector2(p1.dx - p2.dx, p1.dy - p2.dy);
         final vector.Vector2 v2 = vector.Vector2(p3.dx - p2.dx, p3.dy - p2.dy);
@@ -72,11 +248,8 @@ class PosePainter extends CustomPainter {
         return degrees;
       }
 
-      double angleShow(PoseLandmarkType type1, PoseLandmarkType type2,
-          PoseLandmarkType type3) {
-        final PoseLandmark joint1 = pose.landmarks[type1]!;
-        final PoseLandmark joint2 = pose.landmarks[type2]!;
-        final PoseLandmark joint3 = pose.landmarks[type3]!;
+      //Angle of joint
+      double angleShow(joint1, joint2, joint3) {
         return CalculateAngle(
           Offset(translateX(joint1.x, rotation, size, absoluteImageSize),
               translateY(joint1.y, rotation, size, absoluteImageSize)),
@@ -88,156 +261,74 @@ class PosePainter extends CustomPainter {
       }
 
       //Draw arms
-      paintLine(
-          PoseLandmarkType.leftElbow, PoseLandmarkType.leftWrist, leftPaint);
-      paintLine(
-          PoseLandmarkType.leftShoulder, PoseLandmarkType.leftElbow, leftPaint);
-
-      paintLine(PoseLandmarkType.rightShoulder, PoseLandmarkType.rightElbow,
-          rightPaint);
-      paintLine(
-          PoseLandmarkType.rightElbow, PoseLandmarkType.rightWrist, rightPaint);
+      paintLine(jointLeftElbow, jointLeftWrist, leftPaint);
+      paintLine(jointLeftShoulder, jointLeftElbow, leftPaint);
+      paintLine(jointRightShoulder, jointRightElbow, rightPaint);
+      paintLine(jointRightElbow, jointRightWrist, rightPaint);
 
       //Draw hands
-      paintLine(
-          PoseLandmarkType.leftWrist, PoseLandmarkType.leftThumb, leftPaint);
-      paintLine(
-          PoseLandmarkType.leftWrist, PoseLandmarkType.leftIndex, leftPaint);
-      paintLine(
-          PoseLandmarkType.leftWrist, PoseLandmarkType.leftPinky, leftPaint);
-
-      paintLine(
-          PoseLandmarkType.rightWrist, PoseLandmarkType.rightThumb, rightPaint);
-      paintLine(
-          PoseLandmarkType.rightWrist, PoseLandmarkType.rightIndex, rightPaint);
-      paintLine(
-          PoseLandmarkType.rightWrist, PoseLandmarkType.rightPinky, rightPaint);
+      paintLine(jointLeftWrist, jointLeftThumb, leftPaint);
+      paintLine(jointLeftWrist, jointLeftIndex, leftPaint);
+      paintLine(jointLeftWrist, jointLeftPinky, leftPaint);
+      paintLine(jointRightWrist, jointRightThumb, rightPaint);
+      paintLine(jointRightWrist, jointRightIndex, rightPaint);
+      paintLine(jointRightWrist, jointRightPinky, rightPaint);
 
       //Draw body
-      paintLine(
-          PoseLandmarkType.leftShoulder, PoseLandmarkType.leftHip, leftPaint);
-      paintLine(PoseLandmarkType.rightShoulder, PoseLandmarkType.rightHip,
-          rightPaint);
-      paintLine(PoseLandmarkType.leftShoulder, PoseLandmarkType.rightShoulder,
-          whitePaint);
-      paintLine(
-          PoseLandmarkType.leftHip, PoseLandmarkType.rightHip, whitePaint);
+      paintLine(jointLeftShoulder, jointLeftHip, leftPaint);
+      paintLine(jointRightShoulder, jointRightHip, rightPaint);
+      paintLine(jointLeftShoulder, jointRightShoulder, whitePaint);
+      paintLine(jointLeftHip, jointRightHip, whitePaint);
 
       //Draw legs
-      paintLine(PoseLandmarkType.leftHip, PoseLandmarkType.leftKnee, leftPaint);
-      paintLine(
-          PoseLandmarkType.leftKnee, PoseLandmarkType.leftAnkle, leftPaint);
-      paintLine(
-          PoseLandmarkType.leftAnkle, PoseLandmarkType.leftHeel, leftPaint);
-      paintLine(
-          PoseLandmarkType.leftHeel, PoseLandmarkType.leftFootIndex, leftPaint);
-      paintLine(PoseLandmarkType.leftAnkle, PoseLandmarkType.leftFootIndex,
-          leftPaint);
+      paintLine(jointLeftHip, jointLeftKnee, leftPaint);
+      paintLine(jointLeftKnee, jointLeftAnkle, leftPaint);
+      paintLine(jointLeftAnkle, jointLeftHeel, leftPaint);
+      paintLine(jointLeftHeel, jointLeftFootIndex, leftPaint);
+      paintLine(jointLeftAnkle, jointLeftFootIndex, leftPaint);
+      paintLine(jointRightHip, jointRightKnee, rightPaint);
+      paintLine(jointRightKnee, jointRightAnkle, rightPaint);
+      paintLine(jointRightAnkle, jointRightHeel, rightPaint);
+      paintLine(jointRightHeel, jointRightFootIndex, rightPaint);
+      paintLine(jointRightAnkle, jointRightFootIndex, rightPaint);
 
-      paintLine(
-          PoseLandmarkType.rightHip, PoseLandmarkType.rightKnee, rightPaint);
-      paintLine(
-          PoseLandmarkType.rightKnee, PoseLandmarkType.rightAnkle, rightPaint);
-      paintLine(
-          PoseLandmarkType.rightAnkle, PoseLandmarkType.rightHeel, rightPaint);
-      paintLine(PoseLandmarkType.rightHeel, PoseLandmarkType.rightFootIndex,
-          rightPaint);
-      paintLine(PoseLandmarkType.rightAnkle, PoseLandmarkType.rightFootIndex,
-          rightPaint);
-
+      //Display angle of joints
+      final textAngle = TextSpan(
+        text: '${angleShow(jointLeftElbow, jointLeftWrist, jointLeftIndex).toInt()}°(L_Wr)\n' +
+            '${angleShow(jointRightElbow, jointRightWrist, jointRightIndex).toInt()}°(R_Wr)\n' +
+            '${angleShow(jointLeftShoulder, jointLeftHip, jointLeftKnee).toInt()}°(L_Hp L_Kn)\n' +
+            '${angleShow(jointRightShoulder, jointRightHip, jointRightKnee).toInt()}°(R_Hp R_Kn)\n' +
+            '${angleShow(jointLeftShoulder, jointLeftHip, jointLeftAnkle).toInt()}°(L_Hp L_Ak)\n' +
+            '${angleShow(jointRightShoulder, jointRightHip, jointRightAnkle).toInt()}°(R_Hp R_Ak)\n' +
+            '${angleShow(jointLeftAnkle, jointLeftKnee, jointLeftHip).toInt()}°(L_Kn)\n' +
+            '${angleShow(jointRightAnkle, jointRightKnee, jointRightHip).toInt()}°(R_Kn)\n' +
+            '${angleShow(jointLeftKnee, jointLeftAnkle, jointLeftFootIndex).toInt()}°(L_Ft)\n' +
+            '${angleShow(jointRightKnee, jointRightAnkle, jointRightFootIndex).toInt()}°(R_Ft)\n' +
+            '${angleShow(jointLeftShoulder, jointLeftElbow, jointLeftWrist).toInt()}°(L_Eb)\n' +
+            '${angleShow(jointRightShoulder, jointRightElbow, jointRightWrist).toInt()}°(R_Eb)\n' +
+            '${angleShow(jointLeftHip, jointLeftShoulder, jointLeftWrist).toInt()}°(L_Sh L_Wr)\n' +
+            '${angleShow(jointRightHip, jointRightShoulder, jointRightWrist).toInt()}°(R_Sh R_Wr)\n' +
+            '${angleShow(jointLeftHip, jointLeftShoulder, jointLeftElbow).toInt()}°(L_Sh L_Eb)\n' +
+            '${angleShow(jointRightHip, jointRightShoulder, jointRightElbow).toInt()}°(R_Sh R_Eb)\n',
+        style: TextStyle(
+          color: Colors.cyanAccent,
+          fontSize: 18,
+        ),
+      );
 
       final textPainter = TextPainter(
-          text: TextSpan(
-            text: '${angleShow(
-                PoseLandmarkType.leftElbow, PoseLandmarkType.leftWrist,
-                PoseLandmarkType.leftIndex).toInt()}°(L_Wr)\n'
-                + '${angleShow(
-                    PoseLandmarkType.rightElbow, PoseLandmarkType.rightWrist,
-                    PoseLandmarkType.rightIndex).toInt()}°(R_Wr)\n'
-                + '${angleShow(
-                    PoseLandmarkType.leftShoulder, PoseLandmarkType.leftHip,
-                    PoseLandmarkType.leftKnee).toInt()}°(L_Hp L_Kn)\n'
-                + '${angleShow(
-                    PoseLandmarkType.rightShoulder, PoseLandmarkType.rightHip,
-                    PoseLandmarkType.rightKnee).toInt()}°(R_Hp R_Kn)\n'
-                + '${angleShow(
-                    PoseLandmarkType.leftShoulder, PoseLandmarkType.leftHip,
-                    PoseLandmarkType.leftAnkle).toInt()}°(L_Hp L_Ak)\n'
-                + '${angleShow(
-                    PoseLandmarkType.rightShoulder, PoseLandmarkType.rightHip,
-                    PoseLandmarkType.rightAnkle).toInt()}°(R_Hp R_Ak)\n'
-                + '${angleShow(
-                    PoseLandmarkType.leftAnkle, PoseLandmarkType.leftKnee,
-                    PoseLandmarkType.leftHip).toInt()}°(L_Kn)\n'
-                + '${angleShow(
-                    PoseLandmarkType.rightAnkle, PoseLandmarkType.rightKnee,
-                    PoseLandmarkType.rightHip).toInt()}°(R_Kn)\n'
-                + '${angleShow(
-                    PoseLandmarkType.leftKnee, PoseLandmarkType.leftAnkle,
-                    PoseLandmarkType.leftFootIndex).toInt()}°(L_Ft)\n'
-                + '${angleShow(
-                    PoseLandmarkType.rightKnee, PoseLandmarkType.rightAnkle,
-                    PoseLandmarkType.rightFootIndex).toInt()}°(R_Ft)\n'
-                + '${angleShow(
-                    PoseLandmarkType.leftShoulder, PoseLandmarkType.leftElbow,
-                    PoseLandmarkType.leftWrist).toInt()}°(L_Eb)\n'
-                + '${angleShow(
-                    PoseLandmarkType.rightShoulder, PoseLandmarkType.rightElbow,
-                    PoseLandmarkType.rightWrist).toInt()}°(R_Eb)\n'
-                + '${angleShow(
-                    PoseLandmarkType.leftHip, PoseLandmarkType.leftShoulder,
-                    PoseLandmarkType.leftWrist).toInt()}°(L_Sh L_Wr)\n'
-                + '${angleShow(
-                    PoseLandmarkType.rightHip, PoseLandmarkType.rightShoulder,
-                    PoseLandmarkType.rightWrist).toInt()}°(R_Sh R_Wr)\n'
-                + '${angleShow(
-                    PoseLandmarkType.leftHip, PoseLandmarkType.leftShoulder,
-                    PoseLandmarkType.leftElbow).toInt()}°(L_Sh L_Eb)\n'
-                + '${angleShow(
-                    PoseLandmarkType.rightHip, PoseLandmarkType.rightShoulder,
-                    PoseLandmarkType.rightElbow).toInt()}°(R_Sh R_Eb)\n',
-
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 10,
-            ),
-          ),
-          textDirection: TextDirection.ltr,
-          textAlign: TextAlign.right
+        text: textAngle,
+        textAlign: TextAlign.right,
+        textDirection: TextDirection.ltr,
       );
-      textPainter.layout();
 
-      // Draw the text centered around the point (50, 100) for instance
+      textPainter.layout();
+      // Draw the text centered around the point (x, y) for instance
       final offset = Offset(
-          50 - (textPainter.width / 2), 100 - (textPainter.height / 2));
+          375 - (textPainter.width * 0.5), 400 - (textPainter.height * 0.5));
       textPainter.paint(canvas, offset);
     }
   }
-
-  // Offset transform(Offset point, Size size) {
-  //   return Offset(transformX(point.dx, size), transformY(point.dy, size));
-  // }
-  //
-  // double transformX(double x, Size size) {
-  //   switch (rotation) {
-  //     case InputImageRotation.ROTATION_90:
-  //       return x * size.width / imageSize.height;
-  //     case InputImageRotation.ROTATION_270:
-  //       return size.width - x * size.width / imageSize.height;
-  //     default:
-  //       return x * size.width / imageSize.width;
-  //   }
-  // }
-  //
-  // double transformY(double y, Size size) {
-  //   switch (rotation) {
-  //     case InputImageRotation.ROTATION_90:
-  //     case InputImageRotation.ROTATION_270:
-  //       return y * size.height / imageSize.width;
-  //     default:
-  //       return y * size.height / imageSize.height;
-  //   }
-  // }
 
   @override
   bool shouldRepaint(covariant PosePainter oldDelegate) {
