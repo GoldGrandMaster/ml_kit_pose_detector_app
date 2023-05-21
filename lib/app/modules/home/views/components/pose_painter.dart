@@ -3,7 +3,6 @@ import 'package:google_mlkit_pose_detection/google_mlkit_pose_detection.dart';
 import 'coordinate_translator.dart';
 import 'dart:math';
 import 'package:vector_math/vector_math.dart' as vector;
-import 'dart:developer';
 
 class PosePainter extends CustomPainter {
   PosePainter(this.poses, this.absoluteImageSize, this.rotation);
@@ -11,6 +10,11 @@ class PosePainter extends CustomPainter {
   final List<Pose> poses;
   final Size absoluteImageSize;
   final InputImageRotation rotation;
+
+  int cnt = 0;
+  int tp_cnt = 0;
+  int prv = -1, cur = -1;
+  bool bf1 = false, bf2 = false, bf3 = false, bf4 = false;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -37,6 +41,32 @@ class PosePainter extends CustomPainter {
     double floorWithFixedDecimal(double number, int decimalPlaces) =>
         (number * pow(10, decimalPlaces)).floorToDouble() /
         pow(10, decimalPlaces);
+
+    //Calcuate angle of 3 joint points
+    double calculateAngle(Offset p1, Offset p2, Offset p3) {
+      final vector.Vector2 v1 = vector.Vector2(p1.dx - p2.dx, p1.dy - p2.dy);
+      final vector.Vector2 v2 = vector.Vector2(p3.dx - p2.dx, p3.dy - p2.dy);
+      final double dotProduct = v1.dot(v2);
+      final double cosAngle = dotProduct / (v1.length * v2.length);
+      final double angle = acos(cosAngle);
+      double degrees = angle * 180 / pi; // Convert to degrees
+      if (degrees > 180.0) degrees = 360 - degrees;
+      return degrees;
+    }
+
+    //Angle of joint
+    double angleShow(joint1, joint2, joint3) {
+      return calculateAngle(
+        Offset(translateX(joint1.x, rotation, size, absoluteImageSize),
+            translateY(joint1.y, rotation, size, absoluteImageSize)),
+        Offset(translateX(joint2.x, rotation, size, absoluteImageSize),
+            translateY(joint2.y, rotation, size, absoluteImageSize)),
+        Offset(translateX(joint3.x, rotation, size, absoluteImageSize),
+            translateY(joint3.y, rotation, size, absoluteImageSize)),
+      );
+    }
+
+    int leftElbowAngle, rightElbowAngle;
 
     for (final pose in poses) {
       final PoseLandmark jointNose = pose.landmarks[PoseLandmarkType.nose]!;
@@ -144,7 +174,7 @@ class PosePainter extends CustomPainter {
 
       //Notificiation when user's body not fully visible or correct distance
       if (!bf) {
-        final Notification = TextSpan(
+        final notification = TextSpan(
           text:
               'Please Keep your body fully\nvisible on camera to start or\nKeep distance as 5 to 6 ft!',
           style: TextStyle(
@@ -152,20 +182,21 @@ class PosePainter extends CustomPainter {
             fontSize: 30,
           ),
         );
-        final textpainter = TextPainter(
-          text: Notification,
+        final notificationText = TextPainter(
+          text: notification,
           textAlign: TextAlign.center,
           textDirection: TextDirection.ltr,
         );
-        textpainter.layout();
+        notificationText.layout();
 
-        final offSet = Offset(
-            200 - (textpainter.width * 0.5), 50 - (textpainter.height * 0.5));
-        textpainter.paint(canvas, offSet);
+        final notificationPosition = Offset(
+            195 - (notificationText.width * 0.5),
+            50 - (notificationText.height * 0.5));
+        notificationText.paint(canvas, notificationPosition);
       }
 
       //Display Inframelikelihood value of joints
-      final textLikelihood = TextSpan(
+      final likelihood = TextSpan(
         text: 'inframeLikelihood\n' +
             'Nose:${floorWithFixedDecimal(jointNose.likelihood, 4)}\n' +
             'LeftEyeIneer:${floorWithFixedDecimal(jointLeftEyeInner.likelihood, 4)}\n' +
@@ -205,17 +236,18 @@ class PosePainter extends CustomPainter {
           fontSize: 15,
         ),
       );
-      final textpainter = TextPainter(
-        text: textLikelihood,
+      final likelihoodText = TextPainter(
+        text: likelihood,
         textAlign: TextAlign.center,
         textDirection: TextDirection.ltr,
       );
-      textpainter.layout();
+      likelihoodText.layout();
 
-      final offSet = Offset(
-          90 - (textpainter.width * 0.5), 450 - (textpainter.height * 0.5));
-      textpainter.paint(canvas, offSet);
+      final likelihoodPosition = Offset(90 - (likelihoodText.width * 0.5),
+          430 - (likelihoodText.height * 0.5));
+      likelihoodText.paint(canvas, likelihoodPosition);
 
+      //Points of pose
       pose.landmarks.forEach((_, landmark) {
         canvas.drawCircle(
             Offset(
@@ -234,30 +266,6 @@ class PosePainter extends CustomPainter {
             Offset(translateX(joint2.x, rotation, size, absoluteImageSize),
                 translateY(joint2.y, rotation, size, absoluteImageSize)),
             paintType);
-      }
-
-      //Calcuate angle of 3 joint points
-      double CalculateAngle(Offset p1, Offset p2, Offset p3) {
-        final vector.Vector2 v1 = vector.Vector2(p1.dx - p2.dx, p1.dy - p2.dy);
-        final vector.Vector2 v2 = vector.Vector2(p3.dx - p2.dx, p3.dy - p2.dy);
-        final double dotProduct = v1.dot(v2);
-        final double cosAngle = dotProduct / (v1.length * v2.length);
-        final double angle = acos(cosAngle);
-        double degrees = angle * 180 / pi; // Convert to degrees
-        if (degrees > 180.0) degrees = 360 - degrees;
-        return degrees;
-      }
-
-      //Angle of joint
-      double angleShow(joint1, joint2, joint3) {
-        return CalculateAngle(
-          Offset(translateX(joint1.x, rotation, size, absoluteImageSize),
-              translateY(joint1.y, rotation, size, absoluteImageSize)),
-          Offset(translateX(joint2.x, rotation, size, absoluteImageSize),
-              translateY(joint2.y, rotation, size, absoluteImageSize)),
-          Offset(translateX(joint3.x, rotation, size, absoluteImageSize),
-              translateY(joint3.y, rotation, size, absoluteImageSize)),
-        );
       }
 
       //Draw arms
@@ -293,7 +301,7 @@ class PosePainter extends CustomPainter {
       paintLine(jointRightAnkle, jointRightFootIndex, rightPaint);
 
       //Display angle of joints
-      final textAngle = TextSpan(
+      final angleJoints = TextSpan(
         text: '${angleShow(jointLeftElbow, jointLeftWrist, jointLeftIndex).toInt()}°(L_Wr)\n' +
             '${angleShow(jointRightElbow, jointRightWrist, jointRightIndex).toInt()}°(R_Wr)\n' +
             '${angleShow(jointLeftShoulder, jointLeftHip, jointLeftKnee).toInt()}°(L_Hp L_Kn)\n' +
@@ -316,18 +324,83 @@ class PosePainter extends CustomPainter {
         ),
       );
 
-      final textPainter = TextPainter(
-        text: textAngle,
+      final angleJointsText = TextPainter(
+        text: angleJoints,
         textAlign: TextAlign.right,
         textDirection: TextDirection.ltr,
       );
 
-      textPainter.layout();
+      angleJointsText.layout();
       // Draw the text centered around the point (x, y) for instance
-      final offset = Offset(
-          375 - (textPainter.width * 0.5), 400 - (textPainter.height * 0.5));
-      textPainter.paint(canvas, offset);
+      final angleJointsPosition = Offset(333 - (angleJointsText.width * 0.5),
+          400 - (angleJointsText.height * 0.5));
+      angleJointsText.paint(canvas, angleJointsPosition);
+
+      //Count of repetitions
+      leftElbowAngle =
+          angleShow(jointLeftShoulder, jointLeftElbow, jointLeftWrist).toInt();
+      rightElbowAngle =
+          angleShow(jointRightShoulder, jointRightElbow, jointRightWrist)
+              .toInt();
+      int downLimit = 90, upLimit = 90;
+      if (leftElbowAngle >= downLimit && rightElbowAngle >= downLimit) {
+        prv = cur;
+        cur = -1;
+      } else /*if (leftElbowAngle < upLimit && rightElbowAngle < upLimit) */ {
+        prv = cur;
+        cur = 1;
+      }
+      if (prv == 1 && cur == -1) {
+        print("------------ok-------------");
+        cnt++;
+      }
+      // if (!bf1 && prv == -1 && cur == 0) {
+      //   bf1 = true;
+      //   tp_cnt++;
+      //   prv = cur;
+      // }
+      // if (!bf2 && prv == 0 && cur == 1) {
+      //   bf2 = true;
+      //   tp_cnt++;
+      //   prv = cur;
+      // }
+      // if (!bf3 && prv == 1 && cur == 0) {
+      //   bf3 = true;
+      //   tp_cnt++;
+      //   prv = cur;
+      // }
+      // if (!bf4 && prv == 0 && cur == -1) {
+      //   bf4 = true;
+      //   tp_cnt++;
+      //   prv = cur = -1;
+      // }
+      // if (tp_cnt == 4) {
+      //   bf1 = bf2 = bf3 = bf4 = false;
+      //   tp_cnt = 0;
+      //   cnt++;
+      // }
+      // print()
+
+      final repetition = TextSpan(
+        text: 'prv:${prv} ' + 'cur:${cur} ' + 'cnt:${cnt}\n',
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: 15,
+        ),
+      );
+      final repetitionText = TextPainter(
+        text: repetition,
+        textAlign: TextAlign.center,
+        textDirection: TextDirection.ltr,
+      );
+      repetitionText.layout();
+
+      final repetitionPosition = Offset(400 - (repetitionText.width * 0.5),
+          150 - (repetitionText.height * 0.5));
+      repetitionText.paint(canvas, repetitionPosition);
+      // prv = cur;
     }
+    print('**************************************************');
   }
 
   @override

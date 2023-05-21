@@ -8,7 +8,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:ml_kit_pose_detector/main.dart';
+// import 'package:ml_kit_pose_detector/pose_detector.dart';
 
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
