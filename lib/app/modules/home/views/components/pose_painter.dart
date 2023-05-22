@@ -17,10 +17,6 @@ class PosePainter extends CustomPainter {
   final Size absoluteImageSize;
   final InputImageRotation rotation;
 
-  double floorWithFixedDecimal(double number, int decimalPlaces) =>
-      (number * pow(10, decimalPlaces)).floorToDouble() /
-      pow(10, decimalPlaces);
-
   //Calcuate angle of 3 joint points
   double calculateAngle(Offset p1, Offset p2, Offset p3) {
     final vector.Vector2 v1 = vector.Vector2(p1.dx - p2.dx, p1.dy - p2.dy);
@@ -265,7 +261,7 @@ class PosePainter extends CustomPainter {
 
         angleJointsText.layout();
         // Draw the text centered around the point (x, y) for instance
-        final angleJointsPosition = Offset(333 - (angleJointsText.width * 0.5),
+        final angleJointsPosition = Offset(360 - (angleJointsText.width * 0.5),
             400 - (angleJointsText.height * 0.5));
         angleJointsText.paint(canvas, angleJointsPosition);
       }
@@ -346,15 +342,15 @@ class PosePainter extends CustomPainter {
         cur = 1;
       }
       if (prv == 1 && cur == -1) {
-        print("------------ok-------------");
+        print("------------------------------------------count changes!!!");
         cnt++;
       }
 
       final repetition = TextSpan(
-        text: 'leftangle:${leftElbowAngle} ' +
+        text: /*'leftangle:${leftElbowAngle} ' +
             'rightangle:${rightElbowAngle}\n' +
             'prv:${prv} ' +
-            'cur:${cur} ' +
+            'cur:${cur} ' +*/
             'cnt:${cnt}\n',
         style: TextStyle(
           color: Colors.white,
@@ -368,7 +364,7 @@ class PosePainter extends CustomPainter {
       );
       repetitionText.layout();
 
-      final repetitionPosition = Offset(350 - (repetitionText.width * 0.5),
+      final repetitionPosition = Offset(340 - (repetitionText.width * 0.5),
           150 - (repetitionText.height * 0.5));
       repetitionText.paint(canvas, repetitionPosition);
       prv = cur;

@@ -44,6 +44,7 @@ class HomeController extends GetxController {
     } else {
       text = 'Poses found: ${poses.length}\n\n';
       // TODO: set _customPaint to draw landmarks on top of image
+      print('-------------------OK-------------------');
       customPaint = null;
     }
     _isBusy = false;

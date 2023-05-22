@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'dart:ui';
-
+import 'dart:math';
 import 'package:google_mlkit_commons/google_mlkit_commons.dart';
 
 double translateX(
@@ -34,3 +34,6 @@ double translateY(
       return y * size.height / absoluteImageSize.height;
   }
 }
+
+double floorWithFixedDecimal(double number, int decimalPlaces) =>
+    (number * pow(10, decimalPlaces)).floorToDouble() / pow(10, decimalPlaces);
