@@ -5,7 +5,7 @@ import 'dart:math';
 import 'package:vector_math/vector_math.dart' as vector;
 
 int cnt = 0;
-int tp_cnt = 0;
+// int tp_cnt = 0;
 int prv = -1, cur = -1;
 bool bf1 = false, bf2 = false, bf3 = false, bf4 = false;
 int leftElbowAngle = 0, rightElbowAngle = 0;
@@ -141,42 +141,42 @@ class PosePainter extends CustomPainter {
       final PoseLandmark jointRightFootIndex =
           pose.landmarks[PoseLandmarkType.rightFootIndex]!;
 
-      double tp = 0.95;
+      double detect_accuracy = 0.95;
       bool bf = true;
       bf = bf &&
-          (jointNose.likelihood >= tp) &&
-          (jointLeftEyeInner.likelihood >= tp) &&
-          (jointLeftEye.likelihood >= tp) &&
-          (jointLeftEyeOuter.likelihood >= tp) &&
-          (jointRightEyeInner.likelihood >= tp) &&
-          (jointRightEye.likelihood >= tp) &&
-          (jointRightEyeOuter.likelihood >= tp) &&
-          (jointLeftEar.likelihood >= tp) &&
-          (jointRightEar.likelihood >= tp) &&
-          (jointLeftMouth.likelihood >= tp) &&
-          (jointRightMouth.likelihood >= tp) &&
-          (jointLeftShoulder.likelihood >= tp) &&
-          (jointRightShoulder.likelihood >= tp) &&
-          (jointLeftElbow.likelihood >= tp) &&
-          (jointRightElbow.likelihood >= tp) &&
-          (jointLeftWrist.likelihood >= tp) &&
-          (jointRightWrist.likelihood >= tp) &&
-          (jointLeftPinky.likelihood >= tp) &&
-          (jointRightPinky.likelihood >= tp) &&
-          (jointLeftIndex.likelihood >= tp) &&
-          (jointRightIndex.likelihood >= tp) &&
-          (jointLeftThumb.likelihood >= tp) &&
-          (jointRightThumb.likelihood >= tp) &&
-          (jointLeftHip.likelihood >= tp) &&
-          (jointRightHip.likelihood >= tp) &&
-          (jointLeftKnee.likelihood >= tp) &&
-          (jointRightKnee.likelihood >= tp) &&
-          (jointLeftAnkle.likelihood >= tp) &&
-          (jointRightAnkle.likelihood >= tp) &&
-          (jointLeftHeel.likelihood >= tp) &&
-          (jointRightHeel.likelihood >= tp) &&
-          (jointLeftFootIndex.likelihood >= tp) &&
-          (jointRightFootIndex.likelihood >= tp);
+          (jointNose.likelihood >= detect_accuracy) &&
+          (jointLeftEyeInner.likelihood >= detect_accuracy) &&
+          (jointLeftEye.likelihood >= detect_accuracy) &&
+          (jointLeftEyeOuter.likelihood >= detect_accuracy) &&
+          (jointRightEyeInner.likelihood >= detect_accuracy) &&
+          (jointRightEye.likelihood >= detect_accuracy) &&
+          (jointRightEyeOuter.likelihood >= detect_accuracy) &&
+          (jointLeftEar.likelihood >= detect_accuracy) &&
+          (jointRightEar.likelihood >= detect_accuracy) &&
+          (jointLeftMouth.likelihood >= detect_accuracy) &&
+          (jointRightMouth.likelihood >= detect_accuracy) &&
+          (jointLeftShoulder.likelihood >= detect_accuracy) &&
+          (jointRightShoulder.likelihood >= detect_accuracy) &&
+          (jointLeftElbow.likelihood >= detect_accuracy) &&
+          (jointRightElbow.likelihood >= detect_accuracy) &&
+          (jointLeftWrist.likelihood >= detect_accuracy) &&
+          (jointRightWrist.likelihood >= detect_accuracy) &&
+          (jointLeftPinky.likelihood >= detect_accuracy) &&
+          (jointRightPinky.likelihood >= detect_accuracy) &&
+          (jointLeftIndex.likelihood >= detect_accuracy) &&
+          (jointRightIndex.likelihood >= detect_accuracy) &&
+          (jointLeftThumb.likelihood >= detect_accuracy) &&
+          (jointRightThumb.likelihood >= detect_accuracy) &&
+          (jointLeftHip.likelihood >= detect_accuracy) &&
+          (jointRightHip.likelihood >= detect_accuracy) &&
+          (jointLeftKnee.likelihood >= detect_accuracy) &&
+          (jointRightKnee.likelihood >= detect_accuracy) &&
+          (jointLeftAnkle.likelihood >= detect_accuracy) &&
+          (jointRightAnkle.likelihood >= detect_accuracy) &&
+          (jointLeftHeel.likelihood >= detect_accuracy) &&
+          (jointRightHeel.likelihood >= detect_accuracy) &&
+          (jointLeftFootIndex.likelihood >= detect_accuracy) &&
+          (jointRightFootIndex.likelihood >= detect_accuracy);
 
       //Notificiation when user's body not fully visible or correct distance
       if (!bf) {
@@ -268,8 +268,7 @@ class PosePainter extends CustomPainter {
 
       //Display Inframelikelihood value of joints
       final likelihood = TextSpan(
-        text: 'inframeLikelihood\n' +
-            'Nose:${floorWithFixedDecimal(jointNose.likelihood, 4)}\n' +
+        text: 'Nose:${floorWithFixedDecimal(jointNose.likelihood, 4)}\n' +
             'LeftEyeIneer:${floorWithFixedDecimal(jointLeftEyeInner.likelihood, 4)}\n' +
             'LeftEye:${floorWithFixedDecimal(jointLeftEye.likelihood, 4)}\n' +
             'LeftEyeOuter:${floorWithFixedDecimal(jointLeftEyeOuter.likelihood, 4)}\n' +
@@ -329,16 +328,17 @@ class PosePainter extends CustomPainter {
             paint);
       });
 
-      //Count of repetitions
+      //Count of repetitions ,only push up/down exercises
       leftElbowAngle =
           angleShow(jointLeftShoulder, jointLeftElbow, jointLeftWrist).toInt();
       rightElbowAngle =
           angleShow(jointRightShoulder, jointRightElbow, jointRightWrist)
               .toInt();
-      // int downLimit = 90, upLimit = 90;
-      if (leftElbowAngle >= 90 && rightElbowAngle >= 90) {
+      int downLimit = 140, upLimit = 40;
+      if (leftElbowAngle >= downLimit && rightElbowAngle >= downLimit) {
         cur = -1;
-      } else {
+      }
+      if (leftElbowAngle < upLimit && rightElbowAngle < upLimit) {
         cur = 1;
       }
       if (prv == 1 && cur == -1) {
@@ -347,14 +347,10 @@ class PosePainter extends CustomPainter {
       }
 
       final repetition = TextSpan(
-        text: /*'leftangle:${leftElbowAngle} ' +
-            'rightangle:${rightElbowAngle}\n' +
-            'prv:${prv} ' +
-            'cur:${cur} ' +*/
-            'cnt:${cnt}\n',
+        text: 'count: $cnt\n',
         style: TextStyle(
           color: Colors.white,
-          fontSize: 20,
+          fontSize: 30,
         ),
       );
       final repetitionText = TextPainter(
@@ -364,9 +360,10 @@ class PosePainter extends CustomPainter {
       );
       repetitionText.layout();
 
-      final repetitionPosition = Offset(340 - (repetitionText.width * 0.5),
+      final repetitionPosition = Offset(400 - (repetitionText.width * 0.5),
           150 - (repetitionText.height * 0.5));
       repetitionText.paint(canvas, repetitionPosition);
+
       prv = cur;
     }
   }
