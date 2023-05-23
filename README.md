@@ -1,6 +1,6 @@
 # ml_kit_pose_detector
 
-A new Flutter project.
+Flutter project detected using ml_kit.
 
 ## Getting Started
 

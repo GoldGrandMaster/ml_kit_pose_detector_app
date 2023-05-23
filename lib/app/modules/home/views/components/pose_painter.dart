@@ -5,10 +5,7 @@ import 'dart:math';
 import 'package:vector_math/vector_math.dart' as vector;
 
 int cnt = 0;
-// int tp_cnt = 0;
 int prv = -1, cur = -1;
-bool bf1 = false, bf2 = false, bf3 = false, bf4 = false;
-int leftElbowAngle = 0, rightElbowAngle = 0;
 
 class PosePainter extends CustomPainter {
   PosePainter(this.poses, this.absoluteImageSize, this.rotation);
@@ -329,9 +326,9 @@ class PosePainter extends CustomPainter {
       });
 
       //Count of repetitions ,only push up/down exercises
-      leftElbowAngle =
+      int leftElbowAngle =
           angleShow(jointLeftShoulder, jointLeftElbow, jointLeftWrist).toInt();
-      rightElbowAngle =
+      int rightElbowAngle =
           angleShow(jointRightShoulder, jointRightElbow, jointRightWrist)
               .toInt();
       int downLimit = 140, upLimit = 40;
