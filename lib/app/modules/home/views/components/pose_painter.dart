@@ -339,7 +339,7 @@ class PosePainter extends CustomPainter {
         cur = 1;
       }
       if (prv == 1 && cur == -1) {
-        print("------------------------------------------count changes!!!");
+        print("----------------------------------------$cnt--count changes!!!");
         cnt++;
       }
 
