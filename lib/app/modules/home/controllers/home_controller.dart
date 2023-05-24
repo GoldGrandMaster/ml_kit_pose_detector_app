@@ -36,8 +36,6 @@ class HomeController extends GetxController {
     _isBusy = true;
 
     final poses = await _poseDetector.processImage(inputImage);
-    if (inputImage.inputImageData?.size != null)
-      print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ No images');
     if (inputImage.inputImageData?.size != null &&
         inputImage.inputImageData?.imageRotation != null) {
       final painter = PosePainter(poses, inputImage.inputImageData!.size,
@@ -46,7 +44,6 @@ class HomeController extends GetxController {
     } else {
       text = 'Poses found: ${poses.length}\n\n';
       // TODO: set _customPaint to draw landmarks on top of image
-      print('-------------------OK-------------------');
       customPaint = null;
     }
     _isBusy = false;

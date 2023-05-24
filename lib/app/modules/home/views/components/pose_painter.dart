@@ -3,6 +3,7 @@ import 'package:google_mlkit_pose_detection/google_mlkit_pose_detection.dart';
 import 'coordinate_translator.dart';
 import 'dart:math';
 import 'package:vector_math/vector_math.dart' as vector;
+// import 'indicator.dart';
 
 int cnt = 0;
 int prv = -1, cur = -1;
@@ -257,62 +258,12 @@ class PosePainter extends CustomPainter {
         );
 
         angleJointsText.layout();
+
         // Draw the text centered around the point (x, y) for instance
         final angleJointsPosition = Offset(360 - (angleJointsText.width * 0.5),
             400 - (angleJointsText.height * 0.5));
         angleJointsText.paint(canvas, angleJointsPosition);
       }
-
-      //Display Inframelikelihood value of joints
-      final likelihood = TextSpan(
-        text: 'Nose:${floorWithFixedDecimal(jointNose.likelihood, 4)}\n' +
-            'LeftEyeIneer:${floorWithFixedDecimal(jointLeftEyeInner.likelihood, 4)}\n' +
-            'LeftEye:${floorWithFixedDecimal(jointLeftEye.likelihood, 4)}\n' +
-            'LeftEyeOuter:${floorWithFixedDecimal(jointLeftEyeOuter.likelihood, 4)}\n' +
-            'RightEyeInner:${floorWithFixedDecimal(jointRightEyeInner.likelihood, 4)}\n' +
-            'RightEye:${floorWithFixedDecimal(jointRightEye.likelihood, 4)}\n' +
-            'RightEyeOuter:${floorWithFixedDecimal(jointRightEyeOuter.likelihood, 4)}\n' +
-            'LeftEar:${floorWithFixedDecimal(jointLeftEar.likelihood, 4)}\n' +
-            'RightEar:${floorWithFixedDecimal(jointRightEar.likelihood, 4)}\n' +
-            'LeftMouth:${floorWithFixedDecimal(jointLeftMouth.likelihood, 4)}\n' +
-            'RightMouth:${floorWithFixedDecimal(jointRightMouth.likelihood, 4)}\n' +
-            'LeftShoulder:${floorWithFixedDecimal(jointLeftShoulder.likelihood, 4)}\n' +
-            'RightShoulder:${floorWithFixedDecimal(jointRightShoulder.likelihood, 4)}\n' +
-            'LeftElbow:${floorWithFixedDecimal(jointLeftElbow.likelihood, 4)}\n' +
-            'RightElbow:${floorWithFixedDecimal(jointRightElbow.likelihood, 4)}\n' +
-            'LeftWrist:${floorWithFixedDecimal(jointLeftWrist.likelihood, 4)}\n' +
-            'RightWrist:${floorWithFixedDecimal(jointRightWrist.likelihood, 4)}\n' +
-            'LeftPinky:${floorWithFixedDecimal(jointLeftPinky.likelihood, 4)}\n' +
-            'RightPinky:${floorWithFixedDecimal(jointRightPinky.likelihood, 4)}\n' +
-            'LeftIndex:${floorWithFixedDecimal(jointLeftIndex.likelihood, 4)}\n' +
-            'RightIndex:${floorWithFixedDecimal(jointRightIndex.likelihood, 4)}\n' +
-            'LeftThumb:${floorWithFixedDecimal(jointLeftThumb.likelihood, 4)}\n' +
-            'RightThumb:${floorWithFixedDecimal(jointRightThumb.likelihood, 4)}\n' +
-            'LeftHip:${floorWithFixedDecimal(jointLeftHip.likelihood, 4)}\n' +
-            'LeftRightHip:${floorWithFixedDecimal(jointRightHip.likelihood, 4)}\n' +
-            'LeftKnee:${floorWithFixedDecimal(jointLeftKnee.likelihood, 4)}\n' +
-            'RightKnee:${floorWithFixedDecimal(jointRightKnee.likelihood, 4)}\n' +
-            'LeftAnkle:${floorWithFixedDecimal(jointLeftAnkle.likelihood, 4)}\n' +
-            'RightAnkle:${floorWithFixedDecimal(jointRightAnkle.likelihood, 4)}\n' +
-            'LeftHeel:${floorWithFixedDecimal(jointLeftHeel.likelihood, 4)}\n' +
-            'RightHeel:${floorWithFixedDecimal(jointRightHeel.likelihood, 4)}\n' +
-            'LeftFootIndex:${floorWithFixedDecimal(jointLeftFootIndex.likelihood, 4)}\n' +
-            'RightFootIndex:${floorWithFixedDecimal(jointRightFootIndex.likelihood, 4)}\n',
-        style: TextStyle(
-          color: Colors.deepOrange,
-          fontSize: 15,
-        ),
-      );
-      final likelihoodText = TextPainter(
-        text: likelihood,
-        textAlign: TextAlign.center,
-        textDirection: TextDirection.ltr,
-      );
-      likelihoodText.layout();
-
-      final likelihoodPosition = Offset(90 - (likelihoodText.width * 0.5),
-          430 - (likelihoodText.height * 0.5));
-      likelihoodText.paint(canvas, likelihoodPosition);
 
       //Points of pose
       pose.landmarks.forEach((_, landmark) {
@@ -338,13 +289,14 @@ class PosePainter extends CustomPainter {
       if (leftElbowAngle < upLimit && rightElbowAngle < upLimit) {
         cur = 1;
       }
+
       if (prv == 1 && cur == -1) {
-        print("----------------------------------------$cnt--count changes!!!");
         cnt++;
+        print("----------------------------------------$cnt--count changes!!!");
       }
 
       final repetition = TextSpan(
-        text: 'count: $cnt\n',
+        text: '$cnt\n',
         style: TextStyle(
           color: Colors.white,
           fontSize: 30,
@@ -362,6 +314,57 @@ class PosePainter extends CustomPainter {
       repetitionText.paint(canvas, repetitionPosition);
 
       prv = cur;
+
+      // // Display Inframelikelihood value of joints
+      // final likelihood = TextSpan(
+      //   text: 'Nose:${floorWithFixedDecimal(jointNose.likelihood, 4)}\n' +
+      //       'LeftEyeIneer:${floorWithFixedDecimal(jointLeftEyeInner.likelihood, 4)}\n' +
+      //       'LeftEye:${floorWithFixedDecimal(jointLeftEye.likelihood, 4)}\n' +
+      //       'LeftEyeOuter:${floorWithFixedDecimal(jointLeftEyeOuter.likelihood, 4)}\n' +
+      //       'RightEyeInner:${floorWithFixedDecimal(jointRightEyeInner.likelihood, 4)}\n' +
+      //       'RightEye:${floorWithFixedDecimal(jointRightEye.likelihood, 4)}\n' +
+      //       'RightEyeOuter:${floorWithFixedDecimal(jointRightEyeOuter.likelihood, 4)}\n' +
+      //       'LeftEar:${floorWithFixedDecimal(jointLeftEar.likelihood, 4)}\n' +
+      //       'RightEar:${floorWithFixedDecimal(jointRightEar.likelihood, 4)}\n' +
+      //       'LeftMouth:${floorWithFixedDecimal(jointLeftMouth.likelihood, 4)}\n' +
+      //       'RightMouth:${floorWithFixedDecimal(jointRightMouth.likelihood, 4)}\n' +
+      //       'LeftShoulder:${floorWithFixedDecimal(jointLeftShoulder.likelihood, 4)}\n' +
+      //       'RightShoulder:${floorWithFixedDecimal(jointRightShoulder.likelihood, 4)}\n' +
+      //       'LeftElbow:${floorWithFixedDecimal(jointLeftElbow.likelihood, 4)}\n' +
+      //       'RightElbow:${floorWithFixedDecimal(jointRightElbow.likelihood, 4)}\n' +
+      //       'LeftWrist:${floorWithFixedDecimal(jointLeftWrist.likelihood, 4)}\n' +
+      //       'RightWrist:${floorWithFixedDecimal(jointRightWrist.likelihood, 4)}\n' +
+      //       'LeftPinky:${floorWithFixedDecimal(jointLeftPinky.likelihood, 4)}\n' +
+      //       'RightPinky:${floorWithFixedDecimal(jointRightPinky.likelihood, 4)}\n' +
+      //       'LeftIndex:${floorWithFixedDecimal(jointLeftIndex.likelihood, 4)}\n' +
+      //       'RightIndex:${floorWithFixedDecimal(jointRightIndex.likelihood, 4)}\n' +
+      //       'LeftThumb:${floorWithFixedDecimal(jointLeftThumb.likelihood, 4)}\n' +
+      //       'RightThumb:${floorWithFixedDecimal(jointRightThumb.likelihood, 4)}\n' +
+      //       'LeftHip:${floorWithFixedDecimal(jointLeftHip.likelihood, 4)}\n' +
+      //       'LeftRightHip:${floorWithFixedDecimal(jointRightHip.likelihood, 4)}\n' +
+      //       'LeftKnee:${floorWithFixedDecimal(jointLeftKnee.likelihood, 4)}\n' +
+      //       'RightKnee:${floorWithFixedDecimal(jointRightKnee.likelihood, 4)}\n' +
+      //       'LeftAnkle:${floorWithFixedDecimal(jointLeftAnkle.likelihood, 4)}\n' +
+      //       'RightAnkle:${floorWithFixedDecimal(jointRightAnkle.likelihood, 4)}\n' +
+      //       'LeftHeel:${floorWithFixedDecimal(jointLeftHeel.likelihood, 4)}\n' +
+      //       'RightHeel:${floorWithFixedDecimal(jointRightHeel.likelihood, 4)}\n' +
+      //       'LeftFootIndex:${floorWithFixedDecimal(jointLeftFootIndex.likelihood, 4)}\n' +
+      //       'RightFootIndex:${floorWithFixedDecimal(jointRightFootIndex.likelihood, 4)}\n',
+      //   style: TextStyle(
+      //     color: Colors.deepOrange,
+      //     fontSize: 15,
+      //   ),
+      // );
+      // final likelihoodText = TextPainter(
+      //   text: likelihood,
+      //   textAlign: TextAlign.center,
+      //   textDirection: TextDirection.ltr,
+      // );
+      // likelihoodText.layout();
+
+      // final likelihoodPosition = Offset(90 - (likelihoodText.width * 0.5),
+      //     430 - (likelihoodText.height * 0.5));
+      // likelihoodText.paint(canvas, likelihoodPosition);
     }
   }
 
