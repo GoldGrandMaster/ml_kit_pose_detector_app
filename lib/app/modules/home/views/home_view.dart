@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-
+import 'package:percent_indicator/percent_indicator.dart';
 import 'package:get/get.dart';
-
 import '../controllers/home_controller.dart';
 import 'components/camera_view.dart';
 

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_mlkit_pose_detection/google_mlkit_pose_detection.dart';
 import 'coordinate_translator.dart';
+import 'package:percent_indicator/percent_indicator.dart';
 import 'dart:math';
 import 'package:vector_math/vector_math.dart' as vector;
-// import 'indicator.dart';
 
 int cnt = 0;
 int prv = -1, cur = -1;
@@ -29,7 +29,7 @@ class PosePainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    print('**************************************************');
+    // print('**************************************************');
     final paint = Paint()
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2.0
@@ -194,7 +194,7 @@ class PosePainter extends CustomPainter {
         notificationText.layout();
 
         final notificationPosition = Offset(
-            195 - (notificationText.width * 0.5),
+            250 - (notificationText.width * 0.5),
             50 - (notificationText.height * 0.5));
         notificationText.paint(canvas, notificationPosition);
       } else {
@@ -260,7 +260,7 @@ class PosePainter extends CustomPainter {
         angleJointsText.layout();
 
         // Draw the text centered around the point (x, y) for instance
-        final angleJointsPosition = Offset(360 - (angleJointsText.width * 0.5),
+        final angleJointsPosition = Offset(380 - (angleJointsText.width * 0.5),
             400 - (angleJointsText.height * 0.5));
         angleJointsText.paint(canvas, angleJointsPosition);
       }
@@ -314,6 +314,10 @@ class PosePainter extends CustomPainter {
       repetitionText.paint(canvas, repetitionPosition);
 
       prv = cur;
+
+      double calculatePercentage(int k) {
+        return (180 - leftElbowAngle) / 180.0;
+      }
 
       // // Display Inframelikelihood value of joints
       // final likelihood = TextSpan(
