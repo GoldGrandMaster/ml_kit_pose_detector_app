@@ -29,7 +29,33 @@ class PosePainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    // print('**************************************************');
+    double progress_percent;
+
+    final Paint backgroundPaint = Paint()
+      ..color = Colors.grey
+      ..style = PaintingStyle.fill;
+
+    final Paint progressPaint = Paint()
+      ..color = Colors.red
+      ..style = PaintingStyle.fill;
+
+    double left = 30;
+    double top = size.height / 3;
+    double right = left + 10;
+    double bottom = size.height * 2 / 3;
+    // Draw the background bar
+    canvas.drawRect(
+      Rect.fromLTRB(left, top, right, bottom),
+      backgroundPaint,
+    );
+
+    // // Draw the progress bar based on the given percent
+    // canvas.drawRect(
+    //   Rect.fromLTRB(
+    //       left, bottom, right, bottom - (bottom - top) * progress_percent),
+    //   progressPaint,
+    // );
+
     final paint = Paint()
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2.0
@@ -299,7 +325,7 @@ class PosePainter extends CustomPainter {
         text: '$cnt\n',
         style: TextStyle(
           color: Colors.white,
-          fontSize: 30,
+          fontSize: 15,
         ),
       );
       final repetitionText = TextPainter(
@@ -309,15 +335,24 @@ class PosePainter extends CustomPainter {
       );
       repetitionText.layout();
 
-      final repetitionPosition = Offset(400 - (repetitionText.width * 0.5),
-          150 - (repetitionText.height * 0.5));
+      final repetitionPosition = Offset(left + 5 - (repetitionText.width * 0.5),
+          top - 5 - (repetitionText.height * 0.5));
       repetitionText.paint(canvas, repetitionPosition);
 
       prv = cur;
 
-      double calculatePercentage(int k) {
+      double calculatePercentage() {
         return (180 - leftElbowAngle) / 180.0;
       }
+
+      progress_percent = calculatePercentage();
+
+      // Draw the progress bar based on the given percent
+      canvas.drawRect(
+        Rect.fromLTRB(
+            left, bottom, right, bottom - (bottom - top) * progress_percent),
+        progressPaint,
+      );
 
       // // Display Inframelikelihood value of joints
       // final likelihood = TextSpan(

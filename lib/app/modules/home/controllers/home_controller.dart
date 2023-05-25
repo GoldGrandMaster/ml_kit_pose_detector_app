@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_mlkit_pose_detection/google_mlkit_pose_detection.dart';
-
 import '../views/components/pose_painter.dart';
+// import '../views/components/linearprogress_bar.dart';
 
 class HomeController extends GetxController {
   final PoseDetector _poseDetector =

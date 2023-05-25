@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:percent_indicator/percent_indicator.dart';
 import 'package:get/get.dart';
 import '../controllers/home_controller.dart';
 import 'components/camera_view.dart';
+
+// final double progressBarPercent = 0.7;
+// final Color progressBarColor = Colors.red;
 
 class HomeView extends GetView<HomeController> {
   const HomeView({Key? key}) : super(key: key);
