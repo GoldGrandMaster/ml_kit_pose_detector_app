@@ -342,7 +342,8 @@ class PosePainter extends CustomPainter {
       prv = cur;
 
       double calculatePercentage() {
-        return (180 - leftElbowAngle) / 180.0;
+        double res = ((180.0 - leftElbowAngle) / 18.0).toInt() / 10.0;
+        return res;
       }
 
       progress_percent = calculatePercentage();
