@@ -4,9 +4,25 @@ import 'coordinate_translator.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'dart:math';
 import 'package:vector_math/vector_math.dart' as vector;
+import 'dart:async';
+import 'dart:ui' as ui;
+import 'package:flutter/painting.dart' as painting;
 
-int cnt = 0;
+int cnt = 0, counter = 0;
 int prv = -1, cur = -1;
+Timer? timer;
+int seconds = 0;
+
+void startTimer() {
+  timer = Timer.periodic(Duration(seconds: 1), (_) {
+    seconds++;
+  });
+}
+
+void stopTimer() {
+  timer?.cancel();
+  seconds = 0;
+}
 
 class PosePainter extends CustomPainter {
   PosePainter(this.poses, this.absoluteImageSize, this.rotation);
@@ -27,8 +43,11 @@ class PosePainter extends CustomPainter {
     return degrees;
   }
 
+  // startTimer();
+
   @override
   void paint(Canvas canvas, Size size) {
+    //progress_bar
     double progress_percent;
 
     final Paint backgroundPaint = Paint()
@@ -40,9 +59,9 @@ class PosePainter extends CustomPainter {
       ..style = PaintingStyle.fill;
 
     double left = 30;
-    double top = size.height / 3;
+    double top = 1.0 * ((size.height / 3).toInt());
     double right = left + 10;
-    double bottom = size.height * 2 / 3;
+    double bottom = 2 * top;
     // Draw the background bar
     canvas.drawRect(
       Rect.fromLTRB(left, top, right, bottom),
@@ -309,7 +328,7 @@ class PosePainter extends CustomPainter {
           angleShow(jointRightShoulder, jointRightElbow, jointRightWrist)
               .toInt();
       int downLimit = 140, upLimit = 40;
-      if (leftElbowAngle >= downLimit && rightElbowAngle >= downLimit) {
+      if (leftElbowAngle > downLimit && rightElbowAngle > downLimit) {
         cur = -1;
       }
       if (leftElbowAngle < upLimit && rightElbowAngle < upLimit) {
@@ -319,14 +338,15 @@ class PosePainter extends CustomPainter {
       if (prv == 1 && cur == -1) {
         cnt++;
         print("----------------------------------------$cnt--count changes!!!");
+        // stopTimer();
+        seconds = 0;
+        // startTimer();
       }
+      print('########################----------$seconds:seconds');
 
       final repetition = TextSpan(
         text: '$cnt\n',
-        style: TextStyle(
-          color: Colors.white,
-          fontSize: 15,
-        ),
+        style: TextStyle(color: Colors.white, fontSize: 15),
       );
       final repetitionText = TextPainter(
         text: repetition,
@@ -354,6 +374,26 @@ class PosePainter extends CustomPainter {
             left, bottom, right, bottom - (bottom - top) * progress_percent),
         progressPaint,
       );
+
+      ////timer start
+      // int tp = timeCounter(counter);
+
+      final timeElapsed = TextSpan(
+        text: '$seconds',
+        style: TextStyle(color: Colors.white, fontSize: 15),
+      );
+      final timeElapsedText = TextPainter(
+        text: timeElapsed,
+        textAlign: TextAlign.center,
+        textDirection: TextDirection.ltr,
+      );
+
+      timeElapsedText.layout();
+
+      final textX = left + 5 - timeElapsedText.width * 0.5;
+      final textY = bottom + 10 - timeElapsedText.height * 0.5;
+
+      timeElapsedText.paint(canvas, Offset(textX, textY));
 
       // // Display Inframelikelihood value of joints
       // final likelihood = TextSpan(
