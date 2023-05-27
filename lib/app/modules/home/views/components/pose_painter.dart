@@ -1,28 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:google_mlkit_pose_detection/google_mlkit_pose_detection.dart';
 import 'coordinate_translator.dart';
-import 'package:percent_indicator/percent_indicator.dart';
+// import 'package:percent_indicator/percent_indicator.dart';
 import 'dart:math';
 import 'package:vector_math/vector_math.dart' as vector;
-import 'dart:async';
-import 'dart:ui' as ui;
-import 'package:flutter/painting.dart' as painting;
+// import 'dart:async';
+import 'dart:core';
+// import 'dart:ui' as ui;
+// import 'package:flutter/painting.dart' as painting;
 
 int cnt = 0, counter = 0;
 int prv = -1, cur = -1;
-Timer? timer;
-int seconds = 0;
-
-void startTimer() {
-  timer = Timer.periodic(Duration(seconds: 1), (_) {
-    seconds++;
-  });
-}
-
-void stopTimer() {
-  timer?.cancel();
-  seconds = 0;
-}
+double tp = 0;
 
 class PosePainter extends CustomPainter {
   PosePainter(this.poses, this.absoluteImageSize, this.rotation);
@@ -42,8 +31,6 @@ class PosePainter extends CustomPainter {
     if (degrees > 180.0) degrees = 360 - degrees;
     return degrees;
   }
-
-  // startTimer();
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -117,6 +104,8 @@ class PosePainter extends CustomPainter {
           paintType);
     }
 
+    DateTime currentTime = DateTime.now();
+    double ss = currentTime.second + currentTime.millisecond / 1000.0;
     for (final pose in poses) {
       final PoseLandmark jointNose = pose.landmarks[PoseLandmarkType.nose]!;
       final PoseLandmark jointLeftEyeInner =
@@ -337,12 +326,9 @@ class PosePainter extends CustomPainter {
 
       if (prv == 1 && cur == -1) {
         cnt++;
+        tp = ss;
         print("----------------------------------------$cnt--count changes!!!");
-        // stopTimer();
-        seconds = 0;
-        // startTimer();
       }
-      print('########################----------$seconds:seconds');
 
       final repetition = TextSpan(
         text: '$cnt\n',
@@ -375,11 +361,11 @@ class PosePainter extends CustomPainter {
         progressPaint,
       );
 
-      ////timer start
-      // int tp = timeCounter(counter);
-
+      print(ss);
+      //timer start
       final timeElapsed = TextSpan(
-        text: '$seconds',
+        text: '${(ss >= tp ? (ss - tp) : (ss + 60.0 - tp)).toStringAsFixed(1)}',
+        // text: '$currentTime',
         style: TextStyle(color: Colors.white, fontSize: 15),
       );
       final timeElapsedText = TextPainter(

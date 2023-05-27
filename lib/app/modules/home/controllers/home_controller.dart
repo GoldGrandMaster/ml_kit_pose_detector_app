@@ -41,7 +41,6 @@ class HomeController extends GetxController {
       final painter = PosePainter(poses, inputImage.inputImageData!.size,
           inputImage.inputImageData!.imageRotation);
       customPaint = CustomPaint(painter: painter);
-      startTimer();
     } else {
       text = 'Poses found: ${poses.length}\n\n';
       // TODO: set _customPaint to draw landmarks on top of image
