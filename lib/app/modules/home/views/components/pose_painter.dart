@@ -12,9 +12,17 @@ int prv = -1, cur = -1;
 double tp = 0;
 Post? posts;
 var code, message;
+int start_angle = 0, end_angle = 0, varience = 0, fail_time = 0, angleGt = 0;
+String notif_test13 = '';
 
 void getData() async {
   posts = await RemoteService().getPosts();
+  start_angle = int.parse(posts?.result.data.stage2[0].angle1 ?? '');
+  end_angle = int.parse(posts?.result.data.stage2[0].angle2 ?? '');
+  varience = int.parse(posts?.result.data.stage2[0].variance ?? '');
+  fail_time = int.parse(posts?.result.data.stage2[0].failTime ?? '');
+  angleGt = int.parse(posts?.result.data.stage2[0].angleGt ?? '');
+  notif_test13 = posts?.result.data.stage2[0].angleGtMsg ?? '';
   if (posts != null) {
     code = posts?.code;
     message = posts?.msg;
@@ -46,9 +54,10 @@ class PosePainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    getData();
-    print(code);
-    print("~~~~~~~~~~~~~~~~~~~~#Painter#~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+    // rest_api data
+    // getData();
+    // print(message);
+    // print("~~~~~~~~~~~~~~~~~~~~#Painter#~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 
     //progress_bar
     double progress_percent;
@@ -122,6 +131,27 @@ class PosePainter extends CustomPainter {
 
     DateTime currentTime = DateTime.now();
     double ss = currentTime.second + currentTime.millisecond / 1000.0;
+
+    void notification_alarm(String str) {
+      final notification = TextSpan(
+        text: str,
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: 25,
+        ),
+      );
+      final notificationText = TextPainter(
+        text: notification,
+        textAlign: TextAlign.center,
+        textDirection: TextDirection.ltr,
+      );
+      notificationText.layout();
+
+      final notificationPosition = Offset(250 - (notificationText.width * 0.5),
+          50 - (notificationText.height * 0.5));
+      notificationText.paint(canvas, notificationPosition);
+    }
+
     for (final pose in poses) {
       final PoseLandmark jointNose = pose.landmarks[PoseLandmarkType.nose]!;
       final PoseLandmark jointLeftEyeInner =
@@ -228,26 +258,11 @@ class PosePainter extends CustomPainter {
 
       //Notificiation when user's body not fully visible or correct distance
       if (!bf) {
-        final notification = TextSpan(
-          text:
-              'Please Keep your body fully\nvisible on camera to start or\nKeep distance as 5 to 6 ft!',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 25,
-          ),
-        );
-        final notificationText = TextPainter(
-          text: notification,
-          textAlign: TextAlign.center,
-          textDirection: TextDirection.ltr,
-        );
-        notificationText.layout();
-
-        final notificationPosition = Offset(
-            250 - (notificationText.width * 0.5),
-            50 - (notificationText.height * 0.5));
-        notificationText.paint(canvas, notificationPosition);
+        String str =
+            'Please Keep your body fully\nvisible on camera to start or\nKeep distance as 5 to 6 ft!';
+        notification_alarm(str);
       } else {
+        // Draw joints
         //Draw arms
         paintLine(jointLeftElbow, jointLeftWrist, leftPaint);
         paintLine(jointLeftShoulder, jointLeftElbow, leftPaint);
@@ -325,25 +340,37 @@ class PosePainter extends CustomPainter {
             1,
             paint);
       });
+      print(
+          '---------------------------------------------------------------------');
 
-      //Count of repetitions ,only push up/down exercises
-      int leftElbowAngle =
-          angleShow(jointLeftShoulder, jointLeftElbow, jointLeftWrist).toInt();
+      print(angleGt);
+
+      //Count of repetitions ,only push down/up exercises - test13
+      // int leftElbowAngle =
+      //     angleShow(jointLeftShoulder, jointLeftElbow, jointLeftWrist).toInt();
       int rightElbowAngle =
           angleShow(jointRightShoulder, jointRightElbow, jointRightWrist)
               .toInt();
-      int downLimit = 140, upLimit = 40;
-      if (leftElbowAngle > downLimit && rightElbowAngle > downLimit) {
-        cur = -1;
+      // int downLimit = 140, upLimit = 40;
+      if (rightElbowAngle > angleGt) {
+        notification_alarm(notif_test13);
       }
-      if (leftElbowAngle < upLimit && rightElbowAngle < upLimit) {
-        cur = 1;
-      }
+      if (rightElbowAngle > start_angle - varience &&
+          rightElbowAngle < start_angle + varience) cur = -1;
+      if (rightElbowAngle < end_angle - varience &&
+          rightElbowAngle > end_angle + varience) cur = 1;
 
       if (prv == 1 && cur == -1) {
-        cnt++;
-        tp = ss;
-        print("----------------------------------------$cnt--count changes!!!");
+        int ttt = (ss >= tp ? (ss - tp) : (ss + 60.0 - tp)).toInt();
+        if (ttt <= fail_time) {
+          cnt++;
+          tp = ss;
+          print(
+              "----------------------------------------$cnt--count changes!!!");
+        } else {
+          String str = 'too slow';
+          notification_alarm(str);
+        }
       }
 
       final repetition = TextSpan(
@@ -364,7 +391,7 @@ class PosePainter extends CustomPainter {
       prv = cur;
 
       double calculatePercentage() {
-        double res = ((180.0 - leftElbowAngle) / 18.0).toInt() / 10.0;
+        double res = ((180.0 - rightElbowAngle) / 18.0).toInt() / 10.0;
         return res;
       }
 
@@ -377,8 +404,8 @@ class PosePainter extends CustomPainter {
         progressPaint,
       );
 
-      // print(ss);
       //timer start
+      print(ss);
       final timeElapsed = TextSpan(
         text: '${(ss >= tp ? (ss - tp) : (ss + 60.0 - tp)).toStringAsFixed(1)}',
         // text: '$currentTime',
