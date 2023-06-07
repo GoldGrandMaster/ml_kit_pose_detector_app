@@ -1,17 +1,29 @@
+import 'package:Pose_Detector/app/modules/home/models/post.dart';
+import 'package:Pose_Detector/app/modules/services/remote_services.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mlkit_pose_detection/google_mlkit_pose_detection.dart';
 import 'coordinate_translator.dart';
-// import 'package:percent_indicator/percent_indicator.dart';
 import 'dart:math';
 import 'package:vector_math/vector_math.dart' as vector;
-// import 'dart:async';
 import 'dart:core';
-// import 'dart:ui' as ui;
-// import 'package:flutter/painting.dart' as painting;
 
 int cnt = 0, counter = 0;
 int prv = -1, cur = -1;
 double tp = 0;
+Post? posts;
+var code, message;
+
+void getData() async {
+  posts = await RemoteService().getPosts();
+  if (posts != null) {
+    code = posts?.code;
+    message = posts?.msg;
+    print("|||||||||||||||||||||||||||||API|||||||||||||||||||||||||||||");
+    print(message);
+  } else {
+    print('API request failed');
+  }
+}
 
 class PosePainter extends CustomPainter {
   PosePainter(this.poses, this.absoluteImageSize, this.rotation);
@@ -34,6 +46,10 @@ class PosePainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
+    getData();
+    print(code);
+    print("~~~~~~~~~~~~~~~~~~~~#Painter#~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+
     //progress_bar
     double progress_percent;
 
@@ -361,7 +377,7 @@ class PosePainter extends CustomPainter {
         progressPaint,
       );
 
-      print(ss);
+      // print(ss);
       //timer start
       final timeElapsed = TextSpan(
         text: '${(ss >= tp ? (ss - tp) : (ss + 60.0 - tp)).toStringAsFixed(1)}',
@@ -395,7 +411,7 @@ class PosePainter extends CustomPainter {
       //       'LeftMouth:${floorWithFixedDecimal(jointLeftMouth.likelihood, 4)}\n' +
       //       'RightMouth:${floorWithFixedDecimal(jointRightMouth.likelihood, 4)}\n' +
       //       'LeftShoulder:${floorWithFixedDecimal(jointLeftShoulder.likelihood, 4)}\n' +
-      //       'RightShoulder:${floorWithFixedDecimal(jointRightShoulder.likelihood, 4)}\n' +
+      //       'RightShoulder:${floor WithFixedDecimal(jointRightShoulder.likelihood, 4)}\n' +
       //       'LeftElbow:${floorWithFixedDecimal(jointLeftElbow.likelihood, 4)}\n' +
       //       'RightElbow:${floorWithFixedDecimal(jointRightElbow.likelihood, 4)}\n' +
       //       'LeftWrist:${floorWithFixedDecimal(jointLeftWrist.likelihood, 4)}\n' +

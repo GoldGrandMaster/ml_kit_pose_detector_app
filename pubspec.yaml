@@ -19,6 +19,7 @@ dependencies:
   google_mlkit_pose_detection: ^0.4.0
   camera: any
   percent_indicator: ^4.2.3
+  http:
 
 
 dev_dependencies:
