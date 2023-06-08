@@ -9,7 +9,7 @@ import 'dart:core';
 
 int cnt = 0, counter = 0;
 int prv = -1, cur = -1;
-double tp = 0;
+double tp = 0, ss = 0;
 Post? posts;
 var code, message;
 int start_angle = 0, end_angle = 0, varience = 0, fail_time = 0, angleGt = 0;
@@ -17,17 +17,18 @@ String notif_test13 = '';
 
 void getData() async {
   posts = await RemoteService().getPosts();
-  start_angle = int.parse(posts?.result.data.stage2[0].angle1 ?? '');
-  end_angle = int.parse(posts?.result.data.stage2[0].angle2 ?? '');
-  varience = int.parse(posts?.result.data.stage2[0].variance ?? '');
-  fail_time = int.parse(posts?.result.data.stage2[0].failTime ?? '');
-  angleGt = int.parse(posts?.result.data.stage2[0].angleGt ?? '');
-  notif_test13 = posts?.result.data.stage2[0].angleGtMsg ?? '';
+  start_angle = int.parse(posts?.result.data.stage1[0].angle1 ?? '');
+  end_angle = int.parse(posts?.result.data.stage1[0].angle2 ?? '');
+  varience = int.parse(posts?.result.data.stage1[0].variance ?? '');
+  fail_time = int.parse(posts?.result.data.stage1[0].failTime ?? '');
+  angleGt = int.parse(posts?.result.data.stage1[0].angleGt ?? '');
+  notif_test13 = posts?.result.data.stage1[0].angleGtMsg ?? '';
   if (posts != null) {
     code = posts?.code;
     message = posts?.msg;
     print("|||||||||||||||||||||||||||||API|||||||||||||||||||||||||||||");
     print(message);
+    print(notif_test13);
   } else {
     print('API request failed');
   }
@@ -55,7 +56,7 @@ class PosePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     // rest_api data
-    // getData();
+    getData();
     // print(message);
     // print("~~~~~~~~~~~~~~~~~~~~#Painter#~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 
@@ -130,7 +131,7 @@ class PosePainter extends CustomPainter {
     }
 
     DateTime currentTime = DateTime.now();
-    double ss = currentTime.second + currentTime.millisecond / 1000.0;
+    ss = currentTime.second + currentTime.millisecond / 1000.0;
 
     void notification_alarm(String str) {
       final notification = TextSpan(
@@ -294,22 +295,23 @@ class PosePainter extends CustomPainter {
 
         //Display angle of joints
         final angleJoints = TextSpan(
-          text: '${angleShow(jointLeftElbow, jointLeftWrist, jointLeftIndex).toInt()}°(L_Wr)\n' +
-              '${angleShow(jointRightElbow, jointRightWrist, jointRightIndex).toInt()}°(R_Wr)\n' +
-              '${angleShow(jointLeftShoulder, jointLeftHip, jointLeftKnee).toInt()}°(L_Hp L_Kn)\n' +
-              '${angleShow(jointRightShoulder, jointRightHip, jointRightKnee).toInt()}°(R_Hp R_Kn)\n' +
-              '${angleShow(jointLeftShoulder, jointLeftHip, jointLeftAnkle).toInt()}°(L_Hp L_Ak)\n' +
-              '${angleShow(jointRightShoulder, jointRightHip, jointRightAnkle).toInt()}°(R_Hp R_Ak)\n' +
-              '${angleShow(jointLeftAnkle, jointLeftKnee, jointLeftHip).toInt()}°(L_Kn)\n' +
-              '${angleShow(jointRightAnkle, jointRightKnee, jointRightHip).toInt()}°(R_Kn)\n' +
-              '${angleShow(jointLeftKnee, jointLeftAnkle, jointLeftFootIndex).toInt()}°(L_Ft)\n' +
-              '${angleShow(jointRightKnee, jointRightAnkle, jointRightFootIndex).toInt()}°(R_Ft)\n' +
-              '${angleShow(jointLeftShoulder, jointLeftElbow, jointLeftWrist).toInt()}°(L_Eb)\n' +
-              '${angleShow(jointRightShoulder, jointRightElbow, jointRightWrist).toInt()}°(R_Eb)\n' +
-              '${angleShow(jointLeftHip, jointLeftShoulder, jointLeftWrist).toInt()}°(L_Sh L_Wr)\n' +
-              '${angleShow(jointRightHip, jointRightShoulder, jointRightWrist).toInt()}°(R_Sh R_Wr)\n' +
-              '${angleShow(jointLeftHip, jointLeftShoulder, jointLeftElbow).toInt()}°(L_Sh L_Eb)\n' +
-              '${angleShow(jointRightHip, jointRightShoulder, jointRightElbow).toInt()}°(R_Sh R_Eb)\n',
+          // text: '${angleShow(jointLeftElbow, jointLeftWrist, jointLeftIndex).toInt()}°(L_Wr)\n' +
+          //     '${angleShow(jointRightElbow, jointRightWrist, jointRightIndex).toInt()}°(R_Wr)\n' +
+          //     '${angleShow(jointLeftShoulder, jointLeftHip, jointLeftKnee).toInt()}°(L_Hp L_Kn)\n' +
+          //     '${angleShow(jointRightShoulder, jointRightHip, jointRightKnee).toInt()}°(R_Hp R_Kn)\n' +
+          //     '${angleShow(jointLeftShoulder, jointLeftHip, jointLeftAnkle).toInt()}°(L_Hp L_Ak)\n' +
+          //     '${angleShow(jointRightShoulder, jointRightHip, jointRightAnkle).toInt()}°(R_Hp R_Ak)\n' +
+          //     '${angleShow(jointLeftAnkle, jointLeftKnee, jointLeftHip).toInt()}°(L_Kn)\n' +
+          //     '${angleShow(jointRightAnkle, jointRightKnee, jointRightHip).toInt()}°(R_Kn)\n' +
+          //     '${angleShow(jointLeftKnee, jointLeftAnkle, jointLeftFootIndex).toInt()}°(L_Ft)\n' +
+          //     '${angleShow(jointRightKnee, jointRightAnkle, jointRightFootIndex).toInt()}°(R_Ft)\n' +
+          //     '${angleShow(jointLeftShoulder, jointLeftElbow, jointLeftWrist).toInt()}°(L_Eb)\n' +
+          //     '${angleShow(jointRightShoulder, jointRightElbow, jointRightWrist).toInt()}°(R_Eb)\n' +
+          //     '${angleShow(jointLeftHip, jointLeftShoulder, jointLeftWrist).toInt()}°(L_Sh L_Wr)\n' +
+          text:
+              '${angleShow(jointRightHip, jointRightShoulder, jointRightWrist).toInt()}°(R_Sh R_Wr)\n',
+          // '${angleShow(jointLeftHip, jointLeftShoulder, jointLeftElbow).toInt()}°(L_Sh L_Eb)\n' +
+          // '${angleShow(jointRightHip, jointRightShoulder, jointRightElbow).toInt()}°(R_Sh R_Eb)\n',
           style: TextStyle(
             color: Colors.cyanAccent,
             fontSize: 18,
@@ -342,26 +344,38 @@ class PosePainter extends CustomPainter {
       });
       print(
           '---------------------------------------------------------------------');
-
       print(angleGt);
+      // angleGt = 100;
+      // start_angle = 30;
+      // end_angle = 90;
+      // varience = 5;
+      // notif_test13 = 'elbows to high';
+      // fail_time = 5;
 
       //Count of repetitions ,only push down/up exercises - test13
       // int leftElbowAngle =
       //     angleShow(jointLeftShoulder, jointLeftElbow, jointLeftWrist).toInt();
-      int rightElbowAngle =
-          angleShow(jointRightShoulder, jointRightElbow, jointRightWrist)
-              .toInt();
+      int rightAngle =
+          angleShow(jointRightHip, jointRightShoulder, jointRightWrist).toInt();
       // int downLimit = 140, upLimit = 40;
-      if (rightElbowAngle > angleGt) {
+      if (rightAngle > angleGt) {
         notification_alarm(notif_test13);
       }
-      if (rightElbowAngle > start_angle - varience &&
-          rightElbowAngle < start_angle + varience) cur = -1;
-      if (rightElbowAngle < end_angle - varience &&
-          rightElbowAngle > end_angle + varience) cur = 1;
+      if (rightAngle >= start_angle - varience &&
+          rightAngle <= start_angle + varience) {
+        cur = -1;
+        // notification_alarm('down');
+      }
+      if (rightAngle >= end_angle - varience &&
+          rightAngle <= end_angle + varience) {
+        cur = 1;
+        // notification_alarm('up');
+      }
 
       if (prv == 1 && cur == -1) {
         int ttt = (ss >= tp ? (ss - tp) : (ss + 60.0 - tp)).toInt();
+        print('current_time-----------------------------------');
+        print(ttt);
         if (ttt <= fail_time) {
           cnt++;
           tp = ss;
@@ -370,12 +384,13 @@ class PosePainter extends CustomPainter {
         } else {
           String str = 'too slow';
           notification_alarm(str);
+          tp = ss;
         }
       }
 
       final repetition = TextSpan(
         text: '$cnt\n',
-        style: TextStyle(color: Colors.white, fontSize: 15),
+        style: TextStyle(color: Color.fromARGB(255, 5, 1, 255), fontSize: 15),
       );
       final repetitionText = TextPainter(
         text: repetition,
@@ -391,7 +406,7 @@ class PosePainter extends CustomPainter {
       prv = cur;
 
       double calculatePercentage() {
-        double res = ((180.0 - rightElbowAngle) / 18.0).toInt() / 10.0;
+        double res = (min(1.0 * angleGt, rightAngle) / 10.0).toInt() / 10.0;
         return res;
       }
 
@@ -405,11 +420,11 @@ class PosePainter extends CustomPainter {
       );
 
       //timer start
-      print(ss);
+      // print(ss);
       final timeElapsed = TextSpan(
         text: '${(ss >= tp ? (ss - tp) : (ss + 60.0 - tp)).toStringAsFixed(1)}',
         // text: '$currentTime',
-        style: TextStyle(color: Colors.white, fontSize: 15),
+        style: TextStyle(color: Color.fromARGB(255, 5, 1, 255), fontSize: 15),
       );
       final timeElapsedText = TextPainter(
         text: timeElapsed,
